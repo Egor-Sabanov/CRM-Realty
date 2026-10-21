@@ -1,0 +1,32 @@
+CREATE TYPE "PropertyStatus" AS ENUM ('AVAILABLE', 'RESERVED', 'SOLD', 'RENTED');
+CREATE TYPE "PropertyType" AS ENUM ('APARTMENT', 'HOUSE', 'PLOT', 'COMMERCIAL');
+CREATE TYPE "LeadStatus" AS ENUM ('NEW', 'CONTACTED', 'VIEWING', 'OFFER', 'DEAL', 'CLOSED');
+CREATE TABLE "Agent" (
+  "id" TEXT NOT NULL, "name" TEXT NOT NULL, "initials" TEXT NOT NULL,
+  "color" TEXT NOT NULL DEFAULT '#c5f36a', "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT "Agent_pkey" PRIMARY KEY ("id")
+);
+CREATE TABLE "Property" (
+  "id" TEXT NOT NULL, "title" TEXT NOT NULL, "type" "PropertyType" NOT NULL,
+  "status" "PropertyStatus" NOT NULL DEFAULT 'AVAILABLE', "address" TEXT NOT NULL,
+  "district" TEXT NOT NULL, "price" INTEGER NOT NULL, "area" DOUBLE PRECISION NOT NULL,
+  "rooms" INTEGER NOT NULL, "floor" INTEGER, "image" TEXT NOT NULL, "description" TEXT NOT NULL,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP(3) NOT NULL,
+  CONSTRAINT "Property_pkey" PRIMARY KEY ("id")
+);
+CREATE TABLE "Lead" (
+  "id" TEXT NOT NULL, "name" TEXT NOT NULL, "phone" TEXT NOT NULL, "email" TEXT,
+  "status" "LeadStatus" NOT NULL DEFAULT 'NEW', "source" TEXT NOT NULL DEFAULT 'Сайт',
+  "budget" INTEGER, "notes" TEXT NOT NULL DEFAULT '', "propertyId" TEXT, "agentId" TEXT,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP(3) NOT NULL,
+  CONSTRAINT "Lead_pkey" PRIMARY KEY ("id")
+);
+CREATE TABLE "LeadActivity" (
+  "id" TEXT NOT NULL, "leadId" TEXT NOT NULL, "message" TEXT NOT NULL,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT "LeadActivity_pkey" PRIMARY KEY ("id")
+);
+CREATE UNIQUE INDEX "Property_title_key" ON "Property"("title");
+ALTER TABLE "Lead" ADD CONSTRAINT "Lead_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "Property"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Lead" ADD CONSTRAINT "Lead_agentId_fkey" FOREIGN KEY ("agentId") REFERENCES "Agent"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "LeadActivity" ADD CONSTRAINT "LeadActivity_leadId_fkey" FOREIGN KEY ("leadId") REFERENCES "Lead"("id") ON DELETE CASCADE ON UPDATE CASCADE;

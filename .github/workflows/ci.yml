@@ -1,0 +1,24 @@
+name: quality
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://demo:demo@localhost:5432/forma?schema=public
+      SESSION_SECRET: github-actions-placeholder-secret-32-characters
+      ADMIN_EMAIL: manager@example.com
+      ADMIN_PASSWORD: placeholder-password
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm install
+      - run: npx prisma generate
+      - run: npm run lint
+      - run: npm run build

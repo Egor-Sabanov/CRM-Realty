@@ -1,0 +1,6 @@
+import {requireSession} from "@/lib/auth";
+import {signOut} from "@/app/actions";
+import Link from "next/link";
+import styles from "./shell.module.css";
+const nav=[["/dashboard","Обзор","◫"],["/properties","Объекты","⌂"],["/leads","Обращения","↗"]];
+export default async function CrmLayout({children}:{children:React.ReactNode}){const user=await requireSession();return <div className={styles.shell}><aside className={styles.sidebar}><Link className={styles.brand} href="/dashboard"><span>F</span><b>FORMA<small>REALTY WORKSPACE</small></b></Link><p className={styles.caption}>РАБОЧИЙ СТОЛ</p><nav>{nav.map(([href,title,icon])=><Link className={styles.nav} href={href} key={href}><i>{icon}</i>{title}</Link>)}</nav><div className={styles.bottom}><div className={styles.team}><i>А</i><span>Агентство FORMA<small>Командное пространство</small></span></div><form action={signOut}><button>Выйти из аккаунта ↗</button></form></div></aside><div className={styles.main}><header className={styles.topbar}><b className={styles.mobileBrand}>FORMA <i>REALTY</i></b><span className={styles.crumb}>Команда недвижимости <i>·</i> CRM</span><span className={styles.user}><em/>{user.email}<b>{user.email?.[0]?.toUpperCase()}</b></span></header><main className={styles.content}>{children}</main></div></div>;}

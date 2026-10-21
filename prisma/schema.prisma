@@ -1,19 +1,84 @@
-generator client { provider = "prisma-client" output = "../src/generated/prisma" }
-datasource db { provider = "postgresql" }
-enum PropertyStatus { AVAILABLE RESERVED SOLD RENTED }
-enum PropertyType { APARTMENT HOUSE PLOT COMMERCIAL }
-enum LeadStatus { NEW CONTACTED VIEWING OFFER DEAL CLOSED }
-model Agent { id String @id @default(cuid()) name String initials String color String @default("#c5f36a") leads Lead[] createdAt DateTime @default(now()) }
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum PropertyStatus {
+  AVAILABLE
+  RESERVED
+  SOLD
+  RENTED
+}
+
+enum PropertyType {
+  APARTMENT
+  HOUSE
+  PLOT
+  COMMERCIAL
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  VIEWING
+  OFFER
+  DEAL
+  CLOSED
+}
+
+model Agent {
+  id        String   @id @default(cuid())
+  name      String
+  initials  String
+  color     String   @default("#c5f36a")
+  leads     Lead[]
+  createdAt DateTime @default(now())
+}
+
 model Property {
- id String @id @default(cuid()) title String @unique type PropertyType status PropertyStatus @default(AVAILABLE)
- address String district String price Int area Float rooms Int floor Int? image String description String @db.Text
- createdAt DateTime @default(now()) updatedAt DateTime @updatedAt leads Lead[]
+  id          String         @id @default(cuid())
+  title       String         @unique
+  type        PropertyType
+  status      PropertyStatus @default(AVAILABLE)
+  address     String
+  district    String
+  price       Int
+  area        Float
+  rooms       Int
+  floor       Int?
+  image       String
+  description String         @db.Text
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  leads       Lead[]
 }
+
 model Lead {
- id String @id @default(cuid()) name String phone String email String? status LeadStatus @default(NEW)
- source String @default("Сайт") budget Int? notes String @default("") @db.Text propertyId String?
- property Property? @relation(fields:[propertyId],references:[id],onDelete:SetNull) agentId String?
- agent Agent? @relation(fields:[agentId],references:[id],onDelete:SetNull) createdAt DateTime @default(now())
- updatedAt DateTime @updatedAt activities LeadActivity[]
+  id         String        @id @default(cuid())
+  name       String
+  phone      String
+  email      String?
+  status     LeadStatus    @default(NEW)
+  source     String        @default("Сайт")
+  budget     Int?
+  notes      String        @default("") @db.Text
+  propertyId String?
+  property   Property?     @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+  agentId    String?
+  agent      Agent?        @relation(fields: [agentId], references: [id], onDelete: SetNull)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  activities LeadActivity[]
 }
-model LeadActivity { id String @id @default(cuid()) leadId String lead Lead @relation(fields:[leadId],references:[id],onDelete:Cascade) message String createdAt DateTime @default(now()) }
+
+model LeadActivity {
+  id        String   @id @default(cuid())
+  leadId    String
+  lead      Lead    @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  message   String
+  createdAt DateTime @default(now())
+}
